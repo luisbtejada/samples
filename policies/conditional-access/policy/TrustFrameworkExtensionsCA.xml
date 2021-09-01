@@ -1,8 +1,8 @@
 <TrustFrameworkPolicy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" PolicySchemaVersion="0.3.0.0" TenantId="yourtenant.onmicrosoft.com" PolicyId="B2C_1A_TrustFrameworkExtensionsCA" PublicPolicyUri="http://yourtenant.onmicrosoft.com/B2C_1A_TrustFrameworkExtensionsCA">
+  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" PolicySchemaVersion="0.3.0.0" TenantId="ecaesdev13.onmicrosoft.com" PolicyId="B2C_1A_TrustFrameworkExtensionsCA" PublicPolicyUri="http://ecaesdev13.onmicrosoft.com/B2C_1A_TrustFrameworkExtensionsCA">
   <BasePolicy>
-    <TenantId>yourtenant.onmicrosoft.com</TenantId>
+    <TenantId>ecaesdev13.onmicrosoft.com</TenantId>
     <PolicyId>B2C_1A_TrustFrameworkExtensions</PolicyId>
   </BasePolicy>
   <BuildingBlocks>
@@ -13,6 +13,12 @@
         <AdminHelpText />
         <UserHelpText />
       </ClaimType>
+		<ClaimType Id="newPassword">
+			<PredicateValidationReference Id="CustomPassword" />
+		</ClaimType>
+		<ClaimType Id="reenterPassword">
+			<PredicateValidationReference Id="CustomPassword" />
+		</ClaimType>
       <ClaimType Id="isLocalAccountSignUp">
         <DisplayName>isLocalAccountSignUp</DisplayName>
         <DataType>boolean</DataType>
@@ -89,6 +95,59 @@
       </ClaimType>
 
     </ClaimsSchema>
+	<Predicates>
+    <Predicate Id="LengthRange" Method="IsLengthRange">
+      <UserHelpText>The password must be between 6 and 64 characters.</UserHelpText>
+      <Parameters>
+        <Parameter Id="Minimum">6</Parameter>
+        <Parameter Id="Maximum">64</Parameter>
+      </Parameters>
+    </Predicate>
+    <Predicate Id="Lowercase" Method="IncludesCharacters">
+      <UserHelpText>a lowercase letter</UserHelpText>
+      <Parameters>
+        <Parameter Id="CharacterSet">a-z</Parameter>
+      </Parameters>
+    </Predicate>
+    <Predicate Id="Uppercase" Method="IncludesCharacters">
+      <UserHelpText>an uppercase letter</UserHelpText>
+      <Parameters>
+        <Parameter Id="CharacterSet">A-Z</Parameter>
+      </Parameters>
+    </Predicate>
+    <Predicate Id="Number" Method="IncludesCharacters">
+      <UserHelpText>a digit</UserHelpText>
+      <Parameters>
+        <Parameter Id="CharacterSet">0-9</Parameter>
+      </Parameters>
+    </Predicate>
+    <Predicate Id="Symbol" Method="IncludesCharacters">
+      <UserHelpText>a symbol</UserHelpText>
+      <Parameters>
+        <Parameter Id="CharacterSet">@#$%^&amp;*\-_+=[]{}|\\:',.?/`~"();!</Parameter>
+      </Parameters>
+    </Predicate>
+  </Predicates>
+  <PredicateValidations>
+    <PredicateValidation Id="CustomPassword">
+      <PredicateGroups>
+        <PredicateGroup Id="LengthGroup">
+          <PredicateReferences MatchAtLeast="1">
+            <PredicateReference Id="LengthRange" />
+          </PredicateReferences>
+        </PredicateGroup>
+        <PredicateGroup Id="CharacterClasses">
+          <UserHelpText>The password must have at least 3 of the following:</UserHelpText>
+          <PredicateReferences MatchAtLeast="3">
+            <PredicateReference Id="Lowercase" />
+            <PredicateReference Id="Uppercase" />
+            <PredicateReference Id="Number" />
+            <PredicateReference Id="Symbol" />
+          </PredicateReferences>
+        </PredicateGroup>
+      </PredicateGroups>
+    </PredicateValidation>
+  </PredicateValidations>
 
     <ClaimsTransformations>
       <!-- Conditional access claims transformations-->
